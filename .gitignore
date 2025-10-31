@@ -1,0 +1,7 @@
+# Credentials
+credentials.json
+salt.key
+
+# Python
+__pycache__/
+*.pyc
