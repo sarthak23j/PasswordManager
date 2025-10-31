@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify
-from password_logic import PasswordManager
+from app.password_logic import PasswordManager
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates', static_folder='static')
 pm = PasswordManager()
 
 @app.route('/')

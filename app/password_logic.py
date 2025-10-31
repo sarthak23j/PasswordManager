@@ -7,9 +7,9 @@ import base64
 from difflib import get_close_matches
 
 class PasswordManager:
-    def __init__(self, filename='./credentials.json', salt_filename='./salt.key'):
-        self.filename = filename
-        self.salt_filename = salt_filename
+    def __init__(self, filename='credentials.json', salt_filename='salt.key'):
+        self.filename = os.path.join('instance', filename)
+        self.salt_filename = os.path.join('instance', salt_filename)
         self.key = None
 
     def derive_key(self, password, salt):
