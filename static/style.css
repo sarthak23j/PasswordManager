@@ -1,0 +1,189 @@
+body {
+    font-family: sans-serif;
+    background-color: #121212;
+    color: #e0e0e0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+#login-container, #main-container {
+    background-color: #1e1e1e;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 400px;
+}
+
+input {
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    width: 100%; /* Inputs should take full width */
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+    border: 1px solid #333;
+    background-color: #2c2c2c;
+    color: #e0e0e0;
+}
+
+button {
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+    border: 1px solid #333;
+    background-color: #2c2c2c;
+    color: #e0e0e0;
+    cursor: pointer;
+    background-color: #333;
+    border: 1px solid #444;
+}
+
+button:hover {
+    background-color: #444;
+}
+
+#home-buttons-container {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    justify-content: space-between; /* Align buttons to ends */
+    width: 100%; /* Ensure button container matches search box width */
+}
+
+#browse-button {
+    background-color: hsl(207, 25%, 30%); /* More saturated greyish blue */
+    border-color: hsl(207, 25%, 30%);
+}
+
+#browse-button:hover {
+    background-color: hsl(207, 25%, 35%); /* Slightly lighter greyish blue on hover */
+    border-color: hsl(207, 25%, 35%);
+}
+
+#add-nav-button {
+    background-color: hsl(120, 20%, 30%); /* More saturated greyish green */
+    border-color: hsl(120, 20%, 30%);
+}
+
+#add-nav-button:hover {
+    background-color: hsl(120, 20%, 35%); /* Slightly lighter greyish green on hover */
+    border-color: hsl(120, 20%, 35%);
+}
+
+#home-buttons-container button {
+    width: auto; /* Allow buttons to size based on content */
+    flex-grow: 1; /* Allow buttons to grow and fill available space */
+    margin: 0; /* Remove default margin from general button style */
+}
+
+#search-container {
+    position: relative;
+}
+
+#search-results {
+    position: absolute;
+    width: 100%;
+    background-color: #1e1e1e;
+    border: 1px solid #333;
+    border-top: none;
+    z-index: 100;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+#credentials-list {
+    max-height: 300px; /* Adjust as needed */
+    overflow-y: auto;
+    border: 1px solid #333;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.search-result-item, .credential-item {
+    padding: 10px;
+    border-bottom: 1px solid #333;
+    cursor: pointer;
+}
+
+.search-result-item:hover, .credential-item:hover {
+    background-color: #2c2c2c;
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    z-index: 1000; /* Increased z-index to appear on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.popup-content {
+    background-color: #1e1e1e;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 500px; /* Make it more boxy */
+    border-radius: 8px;
+    position: relative; /* Needed for absolute positioning of delete button */
+}
+
+.update-credential-button {
+    position: absolute;
+    bottom: 70px; /* Increased gap */
+    right: 20px;
+    width: 100px; /* Uniform width */
+    height: 35px; /* Reduced height */
+    padding: 5px 10px; /* Reduced padding */
+    margin: 0;
+    background-color: #ffc107; /* Orange color for update */
+    border-color: #ffc107;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.update-credential-button:hover {
+    background-color: #e0a800;
+    border-color: #e0a800;
+}
+
+.delete-credential-button {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 100px; /* Uniform width */
+    height: 35px; /* Reduced height */
+    padding: 5px 10px; /* Reduced padding */
+    margin: 0; /* Remove default margin */
+    background-color: #dc3545; /* Red color for delete */
+    border-color: #dc3545;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.delete-credential-button:hover {
+    background-color: #c82333;
+    border-color: #c82333;
+}
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #e0e0e0;
+    text-decoration: none;
+    cursor: pointer;
+}

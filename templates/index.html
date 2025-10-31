@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Manager</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div id="login-container">
+        <h1>Password Manager.</h1>
+        <input type="password" id="master-password" placeholder="Enter Master Password">
+        <button id="login-button">Login</button>
+    </div>
+
+    <div id="main-container" style="display: none;">
+        <div id="home-view">
+            <div id="home-buttons-container">
+                <button id="browse-button">Browse</button>
+                <button id="add-nav-button">Add</button>
+            </div>
+            <div id="search-container">
+                <input type="text" id="search-box" placeholder="Search...">
+                <div id="search-results"></div>
+            </div>
+        </div>
+
+        <div id="add-view" style="display: none;">
+            <h2 id="add-edit-title">Add New Credential</h2>
+            <input type="text" id="service" placeholder="Service">
+            <input type="text" id="service-type" placeholder="Service Type">
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button id="add-button">Add</button>
+            <button class="back-button">Back</button>
+        </div>
+
+        <div id="browse-view" style="display: none;">
+            <h2>All Credentials</h2>
+            <div id="credentials-list"></div>
+            <button class="back-button">Back</button>
+        </div>
+
+        <div id="credential-card-popup" class="popup">
+            <div class="popup-content"></div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
