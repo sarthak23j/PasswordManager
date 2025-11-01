@@ -8,18 +8,20 @@ The application allows you to securely store, retrieve, update, and delete your 
 
 ## Features
 
-*   **Secure Master Password Login:** Protects your stored credentials with a master password. Pressing 'Enter' in the master password field now submits the login form.
-*   **Add New Credentials:** Easily add new service entries with associated usernames and passwords.
-*   **Browse Credentials:** View all your stored credentials.
-*   **Enhanced Search Functionality:** Quickly find credentials by service name or service type. Search results appear dynamically after typing 2 or more characters.
-*   **Update Existing Credentials:** Modify the details of any stored credential directly from its card.
-*   **Delete Credentials:** Remove unwanted credential entries.
-*   **Intuitive UI:**
-    *   Credential cards are now more compact and visually appealing.
-    *   'Update' and 'Delete' buttons are conveniently placed on the credential card.
-    *   Credential cards close when clicking outside of them.
-    *   The browse section is scrollable to handle a large number of entries.
-    *   Home page buttons ('Browse' and 'Add') have subtle color hints and are uniformly sized and aligned.
+*   **Secure Master Password Login:** Protects your stored credentials with a master password.
+*   **Advanced Tagging System:** Assign multiple tags to each credential for flexible organization.
+*   **Interactive Tag Filtering:**
+    *   Quickly filter credentials by clicking on tags.
+    *   Multi-select tags to see credentials that match all selected tags (AND search) or any of the selected tags (OR search).
+    *   Results are sorted by relevance, showing the credentials with the most matching tags first.
+*   **Dynamic Tag UI:**
+    *   The most frequently used tags are displayed in a clean, expandable two-row layout.
+    *   Autocomplete suggestions help maintain tag consistency when adding or updating credentials.
+*   **Full Credential Management (CRUD):**
+    *   Easily add new credentials with multiple tags.
+    *   View and update existing credentials from a clean, pop-up card.
+    *   Delete credentials you no longer need.
+*   **Dynamic Search:** Quickly find credentials by service name or by tags.
 
 ## Security
 
