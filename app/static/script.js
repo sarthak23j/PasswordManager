@@ -37,7 +37,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const dynamicFieldsDisplay = document.getElementById('dynamic-fields-display');
     const addFieldButton = document.getElementById('add-field-button');
 
+    // Message Container
+    const messageContainer = document.getElementById('message-container');
+
+    // Import/Export Elements
+    const exportButton = document.getElementById('export-button');
+    const importButton = document.getElementById('import-button');
+    const importFileInput = document.getElementById('import-file-input');
+
     let currentServiceToUpdate = null;
+
+    // Function to display messages to the user
+    function displayMessage(message, isError = false) {
+        messageContainer.textContent = message;
+        messageContainer.className = isError ? 'message-error' : 'message-success';
+        messageContainer.style.display = 'block';
+        setTimeout(() => {
+            messageContainer.style.display = 'none';
+            messageContainer.textContent = '';
+        }, 3000); // Message disappears after 3 seconds
+    }
 
     // Navigation
     function showView(view) {
@@ -45,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addView.style.display = 'none';
         browseView.style.display = 'none';
         view.style.display = 'block';
+        messageContainer.style.display = 'none'; // Hide messages on view change
     }
 
     browseButton.addEventListener('click', () => {
@@ -98,8 +118,10 @@ document.addEventListener('DOMContentLoaded', () => {
             mainContainer.style.display = 'block';
             logoutButton.style.display = 'block';
             showView(homeView);
+            displayMessage('Login successful!');
         } else {
-            console.log('Login failed. Please check your master password.');
+            const errorData = await response.json();
+            displayMessage(`Login failed: ${errorData.message || 'Unknown error'}.`, true);
         }
     });
 
@@ -110,30 +132,47 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (response.ok) {
-            console.log('Logged out successfully!');
+            displayMessage('Logged out successfully!');
             loginContainer.style.display = 'block';
             mainContainer.style.display = 'none';
             logoutButton.style.display = 'none';
             masterPasswordInput.value = ''; // Clear master password field
         } else {
-            console.log('Logout failed.');
+            displayMessage('Logout failed.', true);
         }
     });
 
     // Add/Update Credential
     addButton.addEventListener('click', async () => {
-        const service = serviceInput.value;
+        const service = serviceInput.value.trim(); // Trim whitespace
         const tags = tagify.value.map(tag => tag.value);
 
+        if (!service) {
+            displayMessage('Service name cannot be empty.', true);
+            return;
+        }
+
         const fields = {};
+        let allFieldsValid = true;
         document.querySelectorAll('.dynamic-field-row').forEach(row => {
             const fieldName = row.dataset.fieldName;
             const fieldValue = row.dataset.fieldValue;
 
             if (fieldName && fieldValue) {
                 fields[fieldName] = fieldValue;
+            } else if (fieldName && !fieldValue) {
+                // If field name is set but value is empty, it's an invalid field
+                allFieldsValid = false;
+            } else if (!fieldName && fieldValue) {
+                // If field value is set but name is empty, it's an invalid field
+                allFieldsValid = false;
             }
         });
+
+        if (!allFieldsValid) {
+            displayMessage('All dynamic fields must have both a name and a value.', true);
+            return;
+        }
 
         const action = addButton.dataset.action;
 
@@ -154,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (response.ok) {
-            console.log(`Credential ${action === 'update' ? 'updated' : 'added'} successfully!`);
+            displayMessage(`Credential ${action === 'update' ? 'updated' : 'added'} successfully!`);
             serviceInput.value = '';
             tagify.removeAllTags();
             dynamicFieldsDisplay.innerHTML = ''; // Clear dynamic fields
@@ -164,7 +203,8 @@ document.addEventListener('DOMContentLoaded', () => {
             currentServiceToUpdate = null;
             showView(homeView);
         } else {
-            console.log(`Failed to ${action === 'update' ? 'update' : 'add'} credential.`);
+            const errorData = await response.json();
+            displayMessage(`Failed to ${action === 'update' ? 'update' : 'add'} credential: ${errorData.message || 'Unknown error'}.`, true);
         }
     });
 
@@ -324,7 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.key === 'Enter') {
                 const value = inputField.value.trim();
                 if (!value) {
-                    alert('Field cannot be empty.');
+                    displayMessage('Field cannot be empty.', true); // Changed from alert
                     return;
                 }
 
@@ -476,15 +516,87 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                console.log('Credential deleted successfully!');
+                displayMessage('Credential deleted successfully!');
                 closeCredentialCardPopup();
                 loadCredentials(credentialsList);
                 loadTags();
                 searchResults.innerHTML = '';
                 searchBox.value = '';
             } else {
-                console.log('Failed to delete credential.');
+                displayMessage('Failed to delete credential.', true);
             }
         }
+    });
+
+    // Export Credentials
+    exportButton.addEventListener('click', async () => {
+        try {
+            const response = await fetch('/api/export', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'credentials.json'; // Filename
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                displayMessage('Credentials exported successfully!');
+            } else {
+                const errorData = await response.json();
+                displayMessage(`Failed to export credentials: ${errorData.message || 'Unknown error'}.`, true);
+            }
+        } catch (error) {
+            displayMessage(`An error occurred during export: ${error}.`, true);
+        }
+    });
+
+    // Import Credentials
+    importButton.addEventListener('click', () => {
+        importFileInput.click(); // Trigger the hidden file input
+    });
+
+    importFileInput.addEventListener('change', async (event) => {
+        const file = event.target.files[0];
+        if (!file) {
+            displayMessage('No file selected for import.', true);
+            return;
+        }
+
+        if (file.type !== 'application/json') {
+            displayMessage('Only JSON files can be imported.', true);
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch('/api/import', {
+                method: 'POST
+',                body: formData
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                displayMessage(result.message || 'Credentials imported successfully!');
+                loadCredentials(credentialsList);
+                loadTags();
+            } else {
+                const errorData = await response.json();
+                displayMessage(`Failed to import credentials: ${errorData.message || 'Unknown error'}.`, true);
+            }
+        } catch (error) {
+            displayMessage(`An error occurred during import: ${error}.`, true);
+        }
+        // Clear the file input value to allow re-importing the same file
+        event.target.value = '';
     });
 });

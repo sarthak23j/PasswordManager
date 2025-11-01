@@ -1,8 +1,10 @@
 # Credentials
 credentials.json
 salt.key
-GEMINI.md
+instance/
 
 # Python
 __pycache__/
 *.pyc
+.pytest_cache/
+

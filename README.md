@@ -25,10 +25,25 @@ The application allows you to securely store, retrieve, update, and delete your 
     *   View and update existing credentials from a clean, pop-up card.
     *   Delete credentials you no longer need.
 *   **Dynamic Search:** Quickly find credentials by service name or by tags.
+*   **Import/Export Credentials:** Securely import credentials from a JSON file or export your current credentials to a JSON file for backup or migration.
+
+## UI/UX Improvements
+
+*   **Enhanced User Feedback:** A new message system provides clear, temporary success and error notifications for actions like login, logout, and credential management.
+*   **Improved Client-Side Validation:** Client-side validation has been added for form inputs (e.g., service name, dynamic fields) to provide immediate feedback.
+*   **Updated Browse Button Color:** The 'Browse' button now features a slightly more saturated blueish-grey color for better visual appeal.
 
 ## Security
 
 Your credentials are encrypted using Fernet symmetric encryption from the `cryptography` library. The encryption key is derived from your master password using PBKDF2HMAC, ensuring robust security.
+
+## Testing
+
+Comprehensive unit tests have been added for the `PasswordManager` class (`app/password_logic.py`) using `pytest`. These tests ensure the correctness, reliability, and security of the core encryption, decryption, and credential management logic.
+
+## Logging & Error Handling
+
+Robust logging has been integrated across `app/password_logic.py`, `create_user.py`, and `app/main.py` using Python's `logging` module. This provides detailed internal logs for debugging and auditing, without exposing sensitive information. Error handling has also been enhanced to ensure graceful failure and informative messages for critical operations.
 
 ## Building and Running
 
@@ -53,8 +68,5 @@ Your credentials are encrypted using Fernet symmetric encryption from the `crypt
 ## File Descriptions
 
 *   `create_user.py`: A utility script used to create new user accounts. Each user is defined by a master password, which is used to generate unique `salt.key` and `credentials.json` files.
-*   `instance/`: This directory holds instance-specific data, which should not be version controlled.\
-    *   `instance/[hashed_master_password]_credentials.json`: The file where a user's encrypted credentials are stored in JSON format. The filename is derived from a hash of the user's master password. **Do not modify this file directly.**\
+*   `instance/`: This directory holds instance-specific data, which should not be version controlled.\    *   `instance/[hashed_master_password]_credentials.json`: The file where a user's encrypted credentials are stored in JSON format. The filename is derived from a hash of the user's master password. **Do not modify this file directly.**\
     *   `instance/[hashed_master_password]_salt.key`: A file that stores a unique salt used to derive the encryption key from a user's master password. The filename is derived from a hash of the user's master password. **Do not delete or modify this file.**
-
-**Note on Debugging:** This project includes `print` statements in Python files and `console.log` statements in JavaScript files for development and debugging purposes. These are intended to aid in understanding application flow and troubleshooting, and do not interfere with the user experience.

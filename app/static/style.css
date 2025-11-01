@@ -88,13 +88,13 @@ button:hover {
 }
 
 #browse-button {
-    background-color: hsl(207, 25%, 30%); /* More saturated greyish blue */
-    border-color: hsl(207, 25%, 30%);
+    background-color: hsl(207, 40%, 30%); /* More saturated greyish blue */
+    border-color: hsl(207, 40%, 30%);
 }
 
 #browse-button:hover {
-    background-color: hsl(207, 25%, 35%); /* Slightly lighter greyish blue on hover */
-    border-color: hsl(207, 25%, 35%);
+    background-color: hsl(207, 45%, 35%); /* Slightly lighter greyish blue on hover */
+    border-color: hsl(207, 45%, 35%);
 }
 
 #add-nav-button {
@@ -381,4 +381,59 @@ button:hover {
     display: flex;
     justify-content: flex-end;
     margin-top: 10px; /* Add some space from the input field */
+}
+
+#message-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    z-index: 10000;
+    display: none; /* Hidden by default */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.message-success {
+    background-color: #28a745; /* Green for success */
+}
+
+.message-error {
+    background-color: #dc3545; /* Red for error */
+}
+
+#import-export-buttons-container {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 10px;
+}
+
+#export-button {
+    background-color: hsl(220, 20%, 30%); /* A blueish grey */
+    border-color: hsl(220, 20%, 30%);
+    flex-grow: 1;
+    margin: 0;
+}
+
+#export-button:hover {
+    background-color: hsl(220, 20%, 35%);
+    border-color: hsl(220, 20%, 35%);
+}
+
+#import-button {
+    background-color: hsl(280, 20%, 30%); /* A purplish grey */
+    border-color: hsl(280, 20%, 30%);
+    flex-grow: 1;
+    margin: 0;
+}
+
+#import-button:hover {
+    background-color: hsl(280, 20%, 35%);
+    border-color: hsl(280, 20%, 35%);
 }
