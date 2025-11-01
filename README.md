@@ -20,6 +20,8 @@ The application allows you to securely store, retrieve, update, and delete your 
 *   **Full Credential Management (CRUD):**
     *   Easily add new credentials with multiple tags and dynamic custom fields.
     *   **Interactive Dynamic Fields:** Add custom fields (e.g., 'email', 'card_number') with a single input that switches between field name and value entry. Includes a minimalistic Font Awesome trash icon for deletion.
+    *   **Improved Button Layout:** In the add/update view, the 'Add' and 'Back' buttons are now right-aligned, with the 'Back' button positioned to the left of 'Add'. The 'Add' button features a muted green color.
+    *   **Full-Width Tag Input:** The tag input field now spans the full width for better usability.
     *   View and update existing credentials from a clean, pop-up card.
     *   Delete credentials you no longer need.
 *   **Dynamic Search:** Quickly find credentials by service name or by tags.

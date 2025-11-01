@@ -244,13 +244,13 @@ button:hover {
 }
 
 .reset-tag-button {
-    background-color: #dc3545; /* Red color for reset */
-    border-color: #dc3545;
+    background-color: #b03a3a; /* Muted red color for reset */
+    border-color: #b03a3a;
 }
 
 .reset-tag-button:hover {
-    background-color: #c82333;
-    border-color: #c82333;
+    background-color: #9a3232;
+    border-color: #9a3232;
 }
 
 .clickable-tag {
@@ -319,4 +319,26 @@ button:hover {
 
 .remove-field-icon:hover i {
     color: #dc3545; /* Red on hover */
+}
+
+.add-view-buttons-right {
+    display: flex;
+    justify-content: flex-end; /* Aligns items to the right */
+    gap: 10px; /* Space between buttons */
+    margin-top: 10px; /* Add some space from the "Add Field" button */
+}
+
+#add-button {
+    background-color: hsl(120, 30%, 40%); /* Green, saturated but not too bright */
+    border-color: hsl(120, 30%, 40%);
+}
+
+#add-button:hover {
+    background-color: hsl(120, 30%, 45%); /* Slightly lighter green on hover */
+    border-color: hsl(120, 30%, 45%);
+}
+
+.tagify {
+    width: 100%;
+    box-sizing: border-box;
 }
