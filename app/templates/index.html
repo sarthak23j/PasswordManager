@@ -6,6 +6,7 @@
     <title>Password Manager</title>
     <link rel="stylesheet" href="/static/style.css">
     <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
     <div id="login-container">
@@ -30,8 +31,10 @@
             <h2 id="add-edit-title">Add New Credential</h2>
             <input type="text" id="service" placeholder="Service">
             <input type="text" id="tags" placeholder="Tags (comma-separated)">
-            <input type="text" id="username" placeholder="Username">
-            <input type="password" id="password" placeholder="Password">
+            <div id="dynamic-fields-display">
+                <!-- Dynamic fields will be displayed here -->
+            </div>
+            <button id="add-field-button">Add Field</button>
             <button id="add-button">Add</button>
             <button class="back-button">Back</button>
         </div>

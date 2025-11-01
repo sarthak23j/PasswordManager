@@ -243,6 +243,16 @@ button:hover {
     border-color: hsl(207, 45%, 40%);
 }
 
+.reset-tag-button {
+    background-color: #dc3545; /* Red color for reset */
+    border-color: #dc3545;
+}
+
+.reset-tag-button:hover {
+    background-color: #c82333;
+    border-color: #c82333;
+}
+
 .clickable-tag {
     cursor: pointer;
     background-color: #333;
@@ -252,4 +262,61 @@ button:hover {
 
 .clickable-tag:hover {
     background-color: #444;
+}
+
+/* Dynamic Fields Display */
+#dynamic-fields-display {
+    margin-top: 10px;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.dynamic-field-row {
+    display: flex;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid #2c2c2c;
+}
+
+.dynamic-field-row:last-child {
+    border-bottom: none;
+}
+
+.field-name-display {
+    flex-shrink: 0;
+    margin-right: 5px;
+    font-weight: bold;
+    color: #e0e0e0;
+}
+
+.field-name-input, .field-value-input {
+    flex-grow: 1;
+    margin: 0 5px;
+    padding: 5px;
+    border: 1px solid #555;
+    background-color: #2c2c2c;
+    color: #e0e0e0;
+    border-radius: 3px;
+}
+
+.field-name-input:focus, .field-value-input:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.remove-field-icon {
+    cursor: pointer;
+    color: #aaa;
+    font-size: 1.1em;
+    padding: 3px;
+    margin-left: 5px;
+}
+
+.remove-field-icon i {
+    color: #e0e0e0; /* White/light gray for the icon itself */
+}
+
+.remove-field-icon:hover i {
+    color: #dc3545; /* Red on hover */
 }

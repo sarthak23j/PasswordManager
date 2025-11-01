@@ -18,7 +18,8 @@ The application allows you to securely store, retrieve, update, and delete your 
     *   The most frequently used tags are displayed in a clean, expandable two-row layout.
     *   Autocomplete suggestions help maintain tag consistency when adding or updating credentials.
 *   **Full Credential Management (CRUD):**
-    *   Easily add new credentials with multiple tags.
+    *   Easily add new credentials with multiple tags and dynamic custom fields.
+    *   **Interactive Dynamic Fields:** Add custom fields (e.g., 'email', 'card_number') with a single input that switches between field name and value entry. Includes a minimalistic Font Awesome trash icon for deletion.
     *   View and update existing credentials from a clean, pop-up card.
     *   Delete credentials you no longer need.
 *   **Dynamic Search:** Quickly find credentials by service name or by tags.

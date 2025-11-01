@@ -24,17 +24,19 @@ document.addEventListener('DOMContentLoaded', () => {
             closeOnSelect: false
         }
     });
-    const usernameInput = document.getElementById('username');
-    const passwordInput = document.getElementById('password');
     const addButton = document.getElementById('add-button');
-    const addEditTitle = document.getElementById('add-edit-title'); // Get reference to the title
+    const addEditTitle = document.getElementById('add-edit-title');
 
     const credentialsList = document.getElementById('credentials-list');
 
     const credentialCardPopup = document.getElementById('credential-card-popup');
     const popupContent = credentialCardPopup.querySelector('.popup-content');
 
-    let currentServiceToUpdate = null; // Global variable to store the service being updated
+    // Dynamic Fields Elements
+    const dynamicFieldsDisplay = document.getElementById('dynamic-fields-display');
+    const addFieldButton = document.getElementById('add-field-button');
+
+    let currentServiceToUpdate = null;
 
     // Navigation
     function showView(view) {
@@ -51,17 +53,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     addNavButton.addEventListener('click', async () => {
-        // Reset form for adding new credential
         serviceInput.value = '';
         tagify.removeAllTags();
-        usernameInput.value = '';
-        passwordInput.value = '';
+        dynamicFieldsDisplay.innerHTML = ''; // Clear dynamic fields
+        createInteractiveFieldRow(); // Add an initial empty field
         addButton.textContent = 'Add';
         addButton.dataset.action = 'add';
         currentServiceToUpdate = null;
-        addEditTitle.textContent = 'Add New Credential'; // Set title for adding
+        addEditTitle.textContent = 'Add New Credential';
 
-        // Fetch tags for suggestions
         const response = await fetch('/api/tags');
         const tags = await response.json();
         tagify.settings.whitelist = Object.keys(tags);
@@ -105,8 +105,17 @@ document.addEventListener('DOMContentLoaded', () => {
     addButton.addEventListener('click', async () => {
         const service = serviceInput.value;
         const tags = tagify.value.map(tag => tag.value);
-        const username = usernameInput.value;
-        const password = passwordInput.value;
+
+        const fields = {};
+        document.querySelectorAll('.dynamic-field-row').forEach(row => {
+            const fieldName = row.dataset.fieldName;
+            const fieldValue = row.dataset.fieldValue;
+
+            if (fieldName && fieldValue) {
+                fields[fieldName] = fieldValue;
+            }
+        });
+
         const action = addButton.dataset.action;
 
         let url = '/api/credentials';
@@ -122,15 +131,15 @@ document.addEventListener('DOMContentLoaded', () => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ service: service, tags: tags, fields: { username: username, password: password } })
+            body: JSON.stringify({ service: service, tags: tags, fields: fields })
         });
 
         if (response.ok) {
             console.log(`Credential ${action === 'update' ? 'updated' : 'added'} successfully!`);
             serviceInput.value = '';
             tagify.removeAllTags();
-            usernameInput.value = '';
-            passwordInput.value = '';
+            dynamicFieldsDisplay.innerHTML = ''; // Clear dynamic fields
+            createInteractiveFieldRow(); // Add an initial empty field
             addButton.textContent = 'Add';
             addButton.dataset.action = 'add';
             currentServiceToUpdate = null;
@@ -164,7 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
         tagFilterContainer.innerHTML = '';
         tagFilterWrapper.classList.remove('expanded');
 
-        // Remove existing show more button if it exists
         const existingShowMoreButton = document.getElementById('show-more-tags-button');
         if (existingShowMoreButton) {
             existingShowMoreButton.remove();
@@ -173,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const sortedTags = Object.entries(tags).sort((a, b) => b[1] - a[1]);
 
         const resetButton = document.createElement('button');
-        resetButton.className = 'tag-filter-button';
+        resetButton.className = 'tag-filter-button reset-tag-button';
         resetButton.textContent = 'Reset';
         resetButton.dataset.tag = 'all';
         tagFilterContainer.appendChild(resetButton);
@@ -186,7 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
             tagFilterContainer.appendChild(button);
         });
 
-        // Use a timeout to allow the DOM to update before checking for overflow
         setTimeout(() => {
             if (tagFilterContainer.scrollHeight > tagFilterContainer.clientHeight) {
                 const showMoreButton = document.createElement('button');
@@ -234,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
 
-                item.style.display = 'none'; // Hide all items initially
+                item.style.display = 'none';
 
                 if (activeFilters.length === 0) {
                     item.style.display = 'block';
@@ -253,7 +260,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-
 
     // Search Functionality
     searchBox.addEventListener('input', async () => {
@@ -276,23 +282,93 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Create Interactive Field Row
+    function createInteractiveFieldRow(initialFieldName = '', initialFieldValue = '') {
+        const fieldRow = document.createElement('div');
+        fieldRow.className = 'dynamic-field-row';
+        fieldRow.dataset.isNameSet = initialFieldName ? 'true' : 'false';
+        if (initialFieldName) fieldRow.dataset.fieldName = initialFieldName;
+        if (initialFieldValue) fieldRow.dataset.fieldValue = initialFieldValue;
+
+        const inputField = document.createElement('input');
+        inputField.type = 'text';
+        inputField.className = 'field-input';
+
+        if (initialFieldName) {
+            inputField.placeholder = `Enter ${initialFieldName} value`;
+            inputField.value = initialFieldValue;
+        } else {
+            inputField.placeholder = 'Enter field name';
+        }
+
+        inputField.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const value = inputField.value.trim();
+                if (!value) {
+                    alert('Field cannot be empty.');
+                    return;
+                }
+
+                if (fieldRow.dataset.isNameSet === 'false') {
+                    // Setting field name
+                    fieldRow.dataset.fieldName = value;
+                    fieldRow.dataset.isNameSet = 'true';
+                    inputField.placeholder = `Enter ${value} value`;
+                    inputField.value = ''; // Clear for value input
+                } else {
+                    // Setting field value
+                    fieldRow.dataset.fieldValue = value;
+                    inputField.value = value; // Keep value displayed
+                }
+            }
+        });
+
+        inputField.addEventListener('blur', () => {
+            const value = inputField.value.trim();
+            if (fieldRow.dataset.isNameSet === 'true') {
+                fieldRow.dataset.fieldValue = value;
+            }
+        });
+
+        const removeIcon = document.createElement('span');
+        removeIcon.className = 'remove-field-icon';
+        removeIcon.innerHTML = '<i class="far fa-trash-can"></i>'; // Font Awesome trash can icon
+        removeIcon.title = 'Remove Field';
+        removeIcon.addEventListener('click', () => {
+            fieldRow.remove();
+        });
+
+        fieldRow.appendChild(inputField);
+        fieldRow.appendChild(removeIcon);
+
+        dynamicFieldsDisplay.appendChild(fieldRow);
+
+        inputField.focus();
+    }
+
+    // Event Listener for Add Field Button
+    addFieldButton.addEventListener('click', () => createInteractiveFieldRow());
+
     // Function to open credential card popup
     function openCredentialCardPopup(service, credential) {
-        currentServiceToUpdate = service; // Store the service for update operations
+        currentServiceToUpdate = service;
         const tagsHtml = credential.tags.map(tag => `<span class="clickable-tag" data-tag="${tag}">${tag}</span>`).join(', ');
+
+        let fieldsHtml = '';
+        for (const key in credential.fields) {
+            fieldsHtml += `<p><strong>${key}:</strong> ${credential.fields[key]}</p>`;
+        }
+
         popupContent.innerHTML = `
             <span class="close-button">&times;</span>
             <h2>${service}</h2>
             <p><strong>Tags:</strong> ${tagsHtml}</p>
-            <p><strong>Username:</strong> ${credential.fields.username}</p>
-            <p><strong>Password:</strong> ${credential.fields.password}</p>
+            ${fieldsHtml}
             <button class="update-credential-button" data-service="${service}">Update</button>
             <button class="delete-credential-button" data-service="${service}">Delete</button>
         `;
         credentialCardPopup.style.display = 'block';
 
-        // Add event listener to close popup when clicking outside
-        // This listener is added *after* the popup is displayed
         setTimeout(() => {
             document.addEventListener('click', closePopupOutsideClick);
         }, 0);
@@ -302,7 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeCredentialCardPopup() {
         credentialCardPopup.style.display = 'none';
         document.removeEventListener('click', closePopupOutsideClick);
-        currentServiceToUpdate = null; // Clear the service being updated
+        currentServiceToUpdate = null;
     }
 
     // Event handler for clicking outside the popup
@@ -316,7 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', async (e) => {
         if (e.target.classList.contains('search-result-item') || e.target.classList.contains('credential-item')) {
             const service = e.target.dataset.service;
-            const response = await fetch('/api/credentials'); // Fetch all to get details
+            const response = await fetch('/api/credentials');
             const credentials = await response.json();
             const credential = credentials[service];
 
@@ -325,17 +401,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Close popup via close button
         if (e.target.classList.contains('close-button')) {
             closeCredentialCardPopup();
         }
 
-        // Handle clickable tags in popup
         if (e.target.classList.contains('clickable-tag')) {
             const tagToFilter = e.target.dataset.tag;
             closeCredentialCardPopup();
             showView(browseView);
-            // Use a timeout to ensure the browse view is rendered before filtering
             setTimeout(() => {
                 const credentialItems = document.querySelectorAll('.credential-item');
                 credentialItems.forEach(item => {
@@ -351,21 +424,22 @@ document.addEventListener('DOMContentLoaded', () => {
         // Handle Update from popup
         if (e.target.classList.contains('update-credential-button')) {
             const serviceToUpdate = e.target.dataset.service;
-            const response = await fetch('/api/credentials'); // Fetch all to get details
+            const response = await fetch('/api/credentials');
             const credentials = await response.json();
             const credential = credentials[serviceToUpdate];
 
             if (credential) {
                 serviceInput.value = serviceToUpdate;
                 tagify.loadOriginalValues(credential.tags);
-                usernameInput.value = credential.fields.username;
-                passwordInput.value = credential.fields.password;
+                dynamicFieldsDisplay.innerHTML = ''; // Clear existing fields
+                for (const key in credential.fields) {
+                    createInteractiveFieldRow(key, credential.fields[key]);
+                }
                 addButton.textContent = 'Update';
                 addButton.dataset.action = 'update';
                 currentServiceToUpdate = serviceToUpdate;
-                addEditTitle.textContent = 'Update Credential'; // Set title for updating
+                addEditTitle.textContent = 'Update Credential';
 
-                // Fetch tags for suggestions
                 const tagsResponse = await fetch('/api/tags');
                 const tags = await tagsResponse.json();
                 tagify.settings.whitelist = Object.keys(tags);
@@ -384,10 +458,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 console.log('Credential deleted successfully!');
-                closeCredentialCardPopup(); // Close popup after deletion
-                loadCredentials(credentialsList); // Refresh browse view
-                loadTags(); // Refresh tags
-                searchResults.innerHTML = ''; // Clear search results
+                closeCredentialCardPopup();
+                loadCredentials(credentialsList);
+                loadTags();
+                searchResults.innerHTML = '';
                 searchBox.value = '';
             } else {
                 console.log('Failed to delete credential.');
@@ -395,4 +469,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
