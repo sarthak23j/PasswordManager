@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainContainer = document.getElementById('main-container');
     const masterPasswordInput = document.getElementById('master-password');
     const loginButton = document.getElementById('login-button');
+    const logoutButton = document.getElementById('logout-button');
 
     const homeView = document.getElementById('home-view');
     const addView = document.getElementById('add-view');
@@ -95,9 +96,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if (response.ok) {
             loginContainer.style.display = 'none';
             mainContainer.style.display = 'block';
+            logoutButton.style.display = 'block';
             showView(homeView);
         } else {
             console.log('Login failed. Please check your master password.');
+        }
+    });
+
+    // Logout
+    logoutButton.addEventListener('click', async () => {
+        const response = await fetch('/api/logout', {
+            method: 'POST'
+        });
+
+        if (response.ok) {
+            console.log('Logged out successfully!');
+            loginContainer.style.display = 'block';
+            mainContainer.style.display = 'none';
+            logoutButton.style.display = 'none';
+            masterPasswordInput.value = ''; // Clear master password field
+        } else {
+            console.log('Logout failed.');
         }
     });
 

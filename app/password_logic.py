@@ -1,5 +1,6 @@
 import json
 import os
+import hashlib
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -7,9 +8,10 @@ import base64
 from difflib import get_close_matches
 
 class PasswordManager:
-    def __init__(self, filename='credentials.json', salt_filename='salt.key'):
-        self.filename = os.path.join('instance', filename)
-        self.salt_filename = os.path.join('instance', salt_filename)
+    def __init__(self, user_id):
+        hashed_user_id = hashlib.sha256(user_id.encode()).hexdigest()
+        self.filename = os.path.join('instance', f'{hashed_user_id}_credentials.json')
+        self.salt_filename = os.path.join('instance', f'{hashed_user_id}_salt.key')
         self.key = None
 
     def derive_key(self, password, salt):

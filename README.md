@@ -37,27 +37,24 @@ Your credentials are encrypted using Fernet symmetric encryption from the `crypt
     ```bash
     pip install -r requirements.txt
     ```
-3.  **Run the Flask application:**
+3.  **Create a User (First Time Setup):**
+    *   Before running the main application, you need to create a user. Open your terminal in the project's root directory and run:
+        ```bash
+        python create_user.py
+        ```
+    *   Follow the prompts to set a master password for your new user. This will generate user-specific `salt.key` and `credentials.json` files in the `instance/` directory.
+4.  **Run the Flask application:**
     ```bash
     python -m app.main
     ```
-4.  **Access the application:** Open your web browser and navigate to `http://127.0.0.1:5000`.
-5.  **Master Password Setup:** The first time you access the application, you will be prompted to create a master password. This will generate a `salt.key` file and an empty `credentials.json` file within the `instance/` directory.
-6.  **Login:** On subsequent accesses, enter your master password to decrypt and access your credentials.
+5.  **Access the application:** Open your web browser and navigate to `http://127.0.0.1:5000`.
+6.  **Login:** On the login screen, enter the master password you set during the user creation step to decrypt and access your credentials. The application will only allow login for existing users; it will not create a new user if the password doesn't match an existing one.
 
 ## File Descriptions
 
-*   `app/`: This directory contains the main Flask application code.
-    *   `app/__init__.py`: Makes the `app` directory a Python package.
-    *   `app/main.py`: The main Flask application script, handling web routes and API endpoints.
-    *   `app/password_logic.py`: Contains the core logic for password management, including encryption/decryption, and CRUD operations for credentials.
-    *   `app/static/`: Contains static files (CSS, JavaScript) for the frontend.
-        *   `app/static/style.css`: Defines the visual styles of the application.
-        *   `app/static/script.js`: Handles frontend interactivity, API calls, and UI logic.
-    *   `app/templates/`: Contains HTML template files.
-        *   `app/templates/index.html`: The main HTML structure of the single-page application.
-*   `instance/`: This directory holds instance-specific data, which should not be version controlled.
-    *   `instance/credentials.json`: The file where your encrypted credentials areRED in JSON format. **Do not modify this file directly.**
-    *   `instance/salt.key`: A file that stores a unique salt used to derive the encryption key from your master password. **Do not delete or modify this file.**
+*   `create_user.py`: A utility script used to create new user accounts. Each user is defined by a master password, which is used to generate unique `salt.key` and `credentials.json` files.
+*   `instance/`: This directory holds instance-specific data, which should not be version controlled.\
+    *   `instance/[hashed_master_password]_credentials.json`: The file where a user's encrypted credentials are stored in JSON format. The filename is derived from a hash of the user's master password. **Do not modify this file directly.**\
+    *   `instance/[hashed_master_password]_salt.key`: A file that stores a unique salt used to derive the encryption key from a user's master password. The filename is derived from a hash of the user's master password. **Do not delete or modify this file.**
 
 **Note on Debugging:** This project includes `print` statements in Python files and `console.log` statements in JavaScript files for development and debugging purposes. These are intended to aid in understanding application flow and troubleshooting, and do not interfere with the user experience.
