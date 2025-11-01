@@ -32,9 +32,9 @@ def get_credentials():
 def add_credential():
     data = request.get_json()
     service = data.get('service')
-    service_type = data.get('service_type')
+    tags = data.get('tags')
     fields = data.get('fields')
-    if pm.create_credential(service, service_type, fields):
+    if pm.create_credential(service, tags, fields):
         return jsonify({"success": True})
     else:
         return jsonify({"success": False}), 500
@@ -49,9 +49,9 @@ def delete_credential(service):
 @app.route('/api/credentials/<service>', methods=['PUT'])
 def update_credential(service):
     data = request.get_json()
-    new_service_type = data.get('service_type')
+    new_tags = data.get('tags')
     new_fields = data.get('fields')
-    if pm.update_credential(service, new_service_type, new_fields):
+    if pm.update_credential(service, new_tags, new_fields):
         return jsonify({"success": True})
     else:
         return jsonify({"success": False}), 500
@@ -61,6 +61,11 @@ def search_credentials():
     query = request.args.get('q', '')
     results = pm.search_credentials(query)
     return jsonify(results)
+
+@app.route('/api/tags', methods=['GET'])
+def get_tags():
+    tags = pm.get_all_tags()
+    return jsonify(tags)
 
 if __name__ == '__main__':
     app.run(debug=True)

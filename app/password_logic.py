@@ -70,16 +70,16 @@ class PasswordManager:
             f.write(encrypted_data)
         return True
 
-    def create_credential(self, service, service_type, fields):
+    def create_credential(self, service, tags, fields):
         credentials = self.load_credentials()
         if credentials is None:
             return False
 
-        if not service or not service_type or not fields:
+        if not service or not tags or not fields:
             return False
 
         credentials[service] = {
-            'service_type': service_type,
+            'tags': tags,
             'fields': fields
         }
         return self.save_credentials(credentials)
@@ -94,13 +94,13 @@ class PasswordManager:
             return self.save_credentials(credentials)
         return False
 
-    def update_credential(self, service, new_service_type, new_fields):
+    def update_credential(self, service, new_tags, new_fields):
         credentials = self.load_credentials()
         if credentials is None:
             return False
 
         if service in credentials:
-            credentials[service]['service_type'] = new_service_type
+            credentials[service]['tags'] = new_tags
             credentials[service]['fields'] = new_fields
             return self.save_credentials(credentials)
         return False
@@ -113,6 +113,17 @@ class PasswordManager:
         query_lower = query.lower()
         results = []
         for service, data in credentials.items():
-            if query_lower in service.lower() or query_lower in data['service_type'].lower():
+            if query_lower in service.lower() or any(query_lower in tag.lower() for tag in data.get('tags', [])):
                 results.append(service)
         return results
+
+    def get_all_tags(self):
+        credentials = self.load_credentials()
+        if credentials is None:
+            return {}
+        
+        tag_counts = {}
+        for data in credentials.values():
+            for tag in data.get('tags', []):
+                tag_counts[tag] = tag_counts.get(tag, 0) + 1
+        return tag_counts

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Password Manager</title>
     <link rel="stylesheet" href="/static/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
     <div id="login-container">
@@ -28,7 +29,7 @@
         <div id="add-view" style="display: none;">
             <h2 id="add-edit-title">Add New Credential</h2>
             <input type="text" id="service" placeholder="Service">
-            <input type="text" id="service-type" placeholder="Service Type">
+            <input type="text" id="tags" placeholder="Tags (comma-separated)">
             <input type="text" id="username" placeholder="Username">
             <input type="password" id="password" placeholder="Password">
             <button id="add-button">Add</button>
@@ -37,6 +38,9 @@
 
         <div id="browse-view" style="display: none;">
             <h2>All Credentials</h2>
+            <div id="tag-filter-wrapper">
+                <div id="tag-filter-container"></div>
+            </div>
             <div id="credentials-list"></div>
             <button class="back-button">Back</button>
         </div>
@@ -47,5 +51,6 @@
     </div>
 
     <script src="/static/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.min.js"></script>
 </body>
 </html>

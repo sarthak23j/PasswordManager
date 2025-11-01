@@ -14,7 +14,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchResults = document.getElementById('search-results');
 
     const serviceInput = document.getElementById('service');
-    const serviceTypeInput = document.getElementById('service-type');
+    const tagsInput = document.getElementById('tags');
+    const tagify = new Tagify(tagsInput, {
+        whitelist: [],
+        dropdown: {
+            maxItems: 20,
+            classname: "tags-look",
+            enabled: 1,
+            closeOnSelect: false
+        }
+    });
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
     const addButton = document.getElementById('add-button');
@@ -38,18 +47,25 @@ document.addEventListener('DOMContentLoaded', () => {
     browseButton.addEventListener('click', () => {
         showView(browseView);
         loadCredentials(credentialsList);
+        loadTags();
     });
 
-    addNavButton.addEventListener('click', () => {
+    addNavButton.addEventListener('click', async () => {
         // Reset form for adding new credential
         serviceInput.value = '';
-        serviceTypeInput.value = '';
+        tagify.removeAllTags();
         usernameInput.value = '';
         passwordInput.value = '';
         addButton.textContent = 'Add';
         addButton.dataset.action = 'add';
         currentServiceToUpdate = null;
         addEditTitle.textContent = 'Add New Credential'; // Set title for adding
+
+        // Fetch tags for suggestions
+        const response = await fetch('/api/tags');
+        const tags = await response.json();
+        tagify.settings.whitelist = Object.keys(tags);
+
         showView(addView);
     });
 
@@ -88,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add/Update Credential
     addButton.addEventListener('click', async () => {
         const service = serviceInput.value;
-        const service_type = serviceTypeInput.value;
+        const tags = tagify.value.map(tag => tag.value);
         const username = usernameInput.value;
         const password = passwordInput.value;
         const action = addButton.dataset.action;
@@ -106,13 +122,13 @@ document.addEventListener('DOMContentLoaded', () => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ service: service, service_type: service_type, fields: { username: username, password: password } })
+            body: JSON.stringify({ service: service, tags: tags, fields: { username: username, password: password } })
         });
 
         if (response.ok) {
             console.log(`Credential ${action === 'update' ? 'updated' : 'added'} successfully!`);
             serviceInput.value = '';
-            serviceTypeInput.value = '';
+            tagify.removeAllTags();
             usernameInput.value = '';
             passwordInput.value = '';
             addButton.textContent = 'Add';
@@ -134,9 +150,110 @@ document.addEventListener('DOMContentLoaded', () => {
             item.className = 'credential-item';
             item.textContent = service;
             item.dataset.service = service;
+            item.dataset.tags = credentials[service].tags.join(',');
             listElement.appendChild(item);
         }
     }
+
+    // Load Tags (for Browse view)
+    async function loadTags() {
+        const response = await fetch('/api/tags');
+        const tags = await response.json();
+        const tagFilterWrapper = document.getElementById('tag-filter-wrapper');
+        const tagFilterContainer = document.getElementById('tag-filter-container');
+        tagFilterContainer.innerHTML = '';
+        tagFilterWrapper.classList.remove('expanded');
+
+        // Remove existing show more button if it exists
+        const existingShowMoreButton = document.getElementById('show-more-tags-button');
+        if (existingShowMoreButton) {
+            existingShowMoreButton.remove();
+        }
+
+        const sortedTags = Object.entries(tags).sort((a, b) => b[1] - a[1]);
+
+        const resetButton = document.createElement('button');
+        resetButton.className = 'tag-filter-button';
+        resetButton.textContent = 'Reset';
+        resetButton.dataset.tag = 'all';
+        tagFilterContainer.appendChild(resetButton);
+
+        sortedTags.forEach(([tag, count]) => {
+            const button = document.createElement('button');
+            button.className = 'tag-filter-button';
+            button.textContent = tag;
+            button.dataset.tag = tag;
+            tagFilterContainer.appendChild(button);
+        });
+
+        // Use a timeout to allow the DOM to update before checking for overflow
+        setTimeout(() => {
+            if (tagFilterContainer.scrollHeight > tagFilterContainer.clientHeight) {
+                const showMoreButton = document.createElement('button');
+                showMoreButton.id = 'show-more-tags-button';
+                showMoreButton.textContent = 'Show More';
+                showMoreButton.addEventListener('click', () => {
+                    const isExpanded = tagFilterWrapper.classList.toggle('expanded');
+                    showMoreButton.textContent = isExpanded ? 'Show Less' : 'Show More';
+                });
+                tagFilterWrapper.appendChild(showMoreButton);
+            }
+        }, 100);
+    }
+
+    // Tag Filtering
+    let activeFilters = [];
+    document.getElementById('tag-filter-container').addEventListener('click', (e) => {
+        if (e.target.classList.contains('tag-filter-button')) {
+            const button = e.target;
+            const tagToFilter = button.dataset.tag;
+
+            if (tagToFilter === 'all') {
+                activeFilters = [];
+                document.querySelectorAll('.tag-filter-button.active').forEach(btn => btn.classList.remove('active'));
+            } else {
+                button.classList.toggle('active');
+                if (activeFilters.includes(tagToFilter)) {
+                    activeFilters = activeFilters.filter(t => t !== tagToFilter);
+                } else {
+                    activeFilters.push(tagToFilter);
+                }
+            }
+
+            const credentialItems = Array.from(document.querySelectorAll('.credential-item'));
+            const results = [];
+
+            credentialItems.forEach(item => {
+                const itemTags = item.dataset.tags.split(',');
+                let matchCount = 0;
+                if (activeFilters.length > 0) {
+                    activeFilters.forEach(filter => {
+                        if (itemTags.includes(filter)) {
+                            matchCount++;
+                        }
+                    });
+                }
+
+                item.style.display = 'none'; // Hide all items initially
+
+                if (activeFilters.length === 0) {
+                    item.style.display = 'block';
+                } else if (matchCount > 0) {
+                    results.push({ item: item, matches: matchCount });
+                }
+            });
+
+            if (activeFilters.length > 0) {
+                results.sort((a, b) => b.matches - a.matches);
+
+                results.forEach(result => {
+                    result.item.style.display = 'block';
+                    credentialsList.appendChild(result.item);
+                });
+            }
+        }
+    });
+
 
     // Search Functionality
     searchBox.addEventListener('input', async () => {
@@ -162,10 +279,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to open credential card popup
     function openCredentialCardPopup(service, credential) {
         currentServiceToUpdate = service; // Store the service for update operations
+        const tagsHtml = credential.tags.map(tag => `<span class="clickable-tag" data-tag="${tag}">${tag}</span>`).join(', ');
         popupContent.innerHTML = `
             <span class="close-button">&times;</span>
             <h2>${service}</h2>
-            <p><strong>Type:</strong> ${credential.service_type}</p>
+            <p><strong>Tags:</strong> ${tagsHtml}</p>
             <p><strong>Username:</strong> ${credential.fields.username}</p>
             <p><strong>Password:</strong> ${credential.fields.password}</p>
             <button class="update-credential-button" data-service="${service}">Update</button>
@@ -212,6 +330,24 @@ document.addEventListener('DOMContentLoaded', () => {
             closeCredentialCardPopup();
         }
 
+        // Handle clickable tags in popup
+        if (e.target.classList.contains('clickable-tag')) {
+            const tagToFilter = e.target.dataset.tag;
+            closeCredentialCardPopup();
+            showView(browseView);
+            // Use a timeout to ensure the browse view is rendered before filtering
+            setTimeout(() => {
+                const credentialItems = document.querySelectorAll('.credential-item');
+                credentialItems.forEach(item => {
+                    if (item.dataset.tags.includes(tagToFilter)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            }, 0);
+        }
+
         // Handle Update from popup
         if (e.target.classList.contains('update-credential-button')) {
             const serviceToUpdate = e.target.dataset.service;
@@ -221,13 +357,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (credential) {
                 serviceInput.value = serviceToUpdate;
-                serviceTypeInput.value = credential.service_type;
+                tagify.loadOriginalValues(credential.tags);
                 usernameInput.value = credential.fields.username;
                 passwordInput.value = credential.fields.password;
                 addButton.textContent = 'Update';
                 addButton.dataset.action = 'update';
                 currentServiceToUpdate = serviceToUpdate;
                 addEditTitle.textContent = 'Update Credential'; // Set title for updating
+
+                // Fetch tags for suggestions
+                const tagsResponse = await fetch('/api/tags');
+                const tags = await tagsResponse.json();
+                tagify.settings.whitelist = Object.keys(tags);
+
                 showView(addView);
                 closeCredentialCardPopup();
             }
@@ -244,6 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log('Credential deleted successfully!');
                 closeCredentialCardPopup(); // Close popup after deletion
                 loadCredentials(credentialsList); // Refresh browse view
+                loadTags(); // Refresh tags
                 searchResults.innerHTML = ''; // Clear search results
                 searchBox.value = '';
             } else {
