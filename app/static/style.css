@@ -79,13 +79,7 @@ button:hover {
     background-color: #444;
 }
 
-#home-buttons-container {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    justify-content: space-between; /* Align buttons to ends */
-    width: 100%; /* Ensure button container matches search box width */
-}
+
 
 #browse-button {
     background-color: hsl(207, 40%, 30%); /* More saturated greyish blue */
@@ -107,11 +101,15 @@ button:hover {
     border-color: hsl(120, 20%, 35%);
 }
 
-#home-buttons-container button {
-    width: auto; /* Allow buttons to size based on content */
-    flex-grow: 1; /* Allow buttons to grow and fill available space */
-    margin: 0; /* Remove default margin from general button style */
+#home-action-buttons-unified-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+    margin-top: 10px; /* Add some space from the search box */
 }
+
+
 
 #search-container {
     position: relative;
@@ -405,20 +403,15 @@ button:hover {
     background-color: #dc3545; /* Red for error */
 }
 
-#import-export-buttons-container {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    justify-content: space-between;
-    width: 100%;
-    margin-top: 10px;
+
+
+.home-action-button {
+    margin: 0;
 }
 
 #export-button {
     background-color: hsl(220, 20%, 30%); /* A blueish grey */
     border-color: hsl(220, 20%, 30%);
-    flex-grow: 1;
-    margin: 0;
 }
 
 #export-button:hover {
@@ -429,8 +422,6 @@ button:hover {
 #import-button {
     background-color: hsl(280, 20%, 30%); /* A purplish grey */
     border-color: hsl(280, 20%, 30%);
-    flex-grow: 1;
-    margin: 0;
 }
 
 #import-button:hover {

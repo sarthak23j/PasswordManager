@@ -222,4 +222,5 @@ def import_credentials():
         return jsonify({"success": False, "message": "Only JSON files are supported for import."}), 400
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Make sure to change debug=False in a production environment
+    app.run(host='0.0.0.0', port=5000, debug=True)

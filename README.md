@@ -65,6 +65,60 @@ Robust logging has been integrated across `app/password_logic.py`, `create_user.
 5.  **Access the application:** Open your web browser and navigate to `http://127.0.0.1:5000`.
 6.  **Login:** On the login screen, enter the master password you set during the user creation step to decrypt and access your credentials. The application will only allow login for existing users; it will not create a new user if the password doesn't match an existing one.
 
+## Running with Docker
+
+You can also run the application inside a Docker container, which is ideal for deployment on systems like a Raspberry Pi without needing to install Python or other dependencies on the host machine.
+
+1.  **Build the Docker image:**
+    From the project's root directory, run the following command:
+    ```bash
+    docker build -t password-manager .
+    ```
+
+2.  **Create a User (First Time Setup with Docker):**
+    To create a user and the persistent data volume, run the following command. You will be prompted to enter and confirm your master password.
+    
+    **For Windows (Command Prompt):**
+    ```bash
+    docker run -it --rm -v "%cd%/instance:/app/instance" password-manager python create_user.py
+    ```
+    
+    **For Windows (PowerShell):**
+    ```powershell
+    docker run -it --rm -v "${pwd}/instance:/app/instance" password-manager python create_user.py
+    ```
+    
+    **For Linux/macOS:**
+    ```bash
+    docker run -it --rm -v "$(pwd)/instance:/app/instance" password-manager python create_user.py
+    ```
+    This command mounts the local `instance` directory into the container, so the generated user files are saved directly to your project folder.
+
+3.  **Run the Application Container:**
+    Once the user is created, run the application with the following command.
+
+    **For Windows (Command Prompt):**
+    ```bash
+    docker run -d -p 5000:5000 --name password-manager-app -v "%cd%/instance:/app/instance" password-manager
+    ```
+
+    **For Windows (PowerShell):**
+    ```powershell
+    docker run -d -p 5000:5000 --name password-manager-app -v "${pwd}/instance:/app/instance" password-manager
+    ```
+
+    **For Linux/macOS:**
+    ```bash
+    docker run -d -p 5000:5000 --name password-manager-app -v "$(pwd)/instance:/app/instance" password-manager
+    ```
+
+4.  **Access the application:**
+    Open your web browser and navigate to `http://<your-pi-ip-address>:5000` or `http://localhost:5000` if running on your local machine.
+
+5.  **Stopping and Starting the container:**
+    *   To stop the container: `docker stop password-manager-app`
+    *   To start the container again: `docker start password-manager-app`
+
 ## File Descriptions
 
 *   `create_user.py`: A utility script used to create new user accounts. Each user is defined by a master password, which is used to generate unique `salt.key` and `credentials.json` files.

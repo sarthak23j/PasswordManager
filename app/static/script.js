@@ -580,8 +580,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const response = await fetch('/api/import', {
-                method: 'POST
-',                body: formData
+                method: 'POST',
+                body: formData
             });
 
             if (response.ok) {
